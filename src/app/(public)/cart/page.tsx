@@ -5,6 +5,7 @@ import { useCart } from "@/hooks/cart";
 import { IOrderPayload, useOrder } from "@/hooks/order";
 import { useGlobalState } from "@/hooks/state";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -12,6 +13,8 @@ export default function Cart() {
   const [user] = useGlobalState('user')
   const [isUserLoading] = useGlobalState('isUserLoading')
   const { createOrder } = useOrder()
+  const [isSubmit, setIsSubmit] = useState(false)
+  const [isOutOfStock, setIsOutOfStock] = useState(false)
   const { isLoading, carts, getCarts, removeFromCart } = useCart()
   const [orderPayload, setOrderPayload] = useState<IOrderPayload>({
     buyer_id: '',
@@ -48,7 +51,16 @@ export default function Cart() {
   }
 
   const handleClickPlaceOrder = () => {
-    createOrder(orderPayload)
+    setIsSubmit(true)
+    let isValid = true;
+
+    if (!orderPayload.shipping_address || !orderPayload.shipping_name || !orderPayload.shipping_phone) {
+      isValid = false;
+    }
+
+    if (isValid) {
+      createOrder(orderPayload)
+    }
   }
 
   useEffect(() => {
@@ -56,7 +68,18 @@ export default function Cart() {
       router.replace('/login')
       return;
     }
+  }, [isUserLoading, user])
 
+  useEffect(() => {
+    const isSomeOutOfStock = carts.filter(cart => cart.book.quantity < cart.quantity)
+    if (isSomeOutOfStock.length > 0) {
+      setIsOutOfStock(true)
+    } else {
+      setIsOutOfStock(false)
+    }
+  }, [carts])
+
+  useEffect(() => {
     setOrderPayload((prevState) => ({ ...prevState, buyer_id: user?.id! }));
 
     if (!ignore) {
@@ -92,7 +115,14 @@ export default function Cart() {
                       <div className="text-sm text-gray-500">Quantity: <span className="text-black font-semibold">{cart.quantity}</span> pcs</div>
                       <div className="text-sm text-gray-500">Price: <span className="text-black font-semibold">{formatUSD(cart.book.price)}</span></div>
                     </div>
-                    <div className="text-md">Amount: <span className="font-semibold">{formatUSD(cart.quantity * cart.book.price)}</span></div>
+                    <div className="flex justify-between">
+                      <div className="text-md">Amount: <span className="font-semibold">{formatUSD(cart.quantity * cart.book.price)}</span></div>
+                      <div className="text-md">
+                        {(cart.book.quantity < cart.quantity) &&
+                          <span className="text-red-500">Out of stock!</span>
+                        }
+                      </div>
+                    </div>
                   </div>
                 </div>
               )
@@ -114,24 +144,33 @@ export default function Cart() {
           <hr className="my-3" />
           <div className="text-3xl text-center mb-4">Shipping Information</div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="name">What is your name?</label>
+            <label htmlFor="name">What is your name? *</label>
             <input className="w-96 p-2 border-2 rounded-md" type="text" name="name" id="name" onChange={onChangeShippingNameInput} />
+            {isSubmit && !orderPayload.shipping_name && <span className="text-sm text-red-500">shipping name is required</span>}
           </div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="phone">What is your phone number?</label>
+            <label htmlFor="phone">What is your phone number? *</label>
             <input className="w-96 p-2 border-2 rounded-md" type="tel" name="phone" id="phone" onChange={onChangeShippingPhoneInput} />
+            {isSubmit && !orderPayload.shipping_phone && <span className="text-sm text-red-500">shipping phone is required</span>}
           </div>
           <div className="flex flex-col mb-4">
-            <label htmlFor="address">Where we have to delivery your orders?</label>
+            <label htmlFor="address">Where we have to delivery your orders? *</label>
             <textarea className="p-2 border-2 rounded-md" name="address" id="address" cols={30} rows={10} onChange={onChangeShippingAddressInput}></textarea>
+            {isSubmit && !orderPayload.shipping_address && <span className="text-sm text-red-500">shipping address is required</span>}
           </div>
-          <button className="bg-gray-900 py-2 mb-4 w-full rounded-md text-white font-semibold" onClick={handleClickPlaceOrder}>Place Order</button>
+          <button className="bg-gray-900 py-2 mb-4 w-full rounded-md text-white font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled={isOutOfStock} onClick={handleClickPlaceOrder}>Place Order</button>
         </>
       }
       {!isLoading && carts.length === 0 &&
-        <div className="mx-auto text-center text-2xl">
-          Your cart is empty
-        </div>
+        <>
+          <div className="mx-auto text-center text-2xl">
+            Your cart is empty
+          </div>
+          <div className="mx-auto text-center mt-10">
+            <Link href={'/'} className="bg-gray-900 py-2 px-4 rounded-md text-white font-semibold">Lets Shopping!</Link>
+          </div>
+        </>
       }
     </div>
   )

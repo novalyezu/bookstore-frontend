@@ -28,7 +28,9 @@ export default function Order() {
       router.replace('/login')
       return;
     }
+  }, [isUserLoading, user])
 
+  useEffect(() => {
     if (!ignore) {
       getOrders({ page, limit, orderBy });
     }
@@ -83,9 +85,14 @@ export default function Order() {
         </>
       }
       {!isLoading && orders.length === 0 &&
-        <div className="mx-auto text-center text-2xl">
-          Your orders is empty
-        </div>
+        <>
+          <div className="mx-auto text-center text-2xl">
+            Your orders is empty
+          </div>
+          <div className="mx-auto text-center mt-10">
+            <Link href={'/'} className="bg-gray-900 py-2 px-4 rounded-md text-white font-semibold">Lets Shopping!</Link>
+          </div>
+        </>
       }
     </div>
   )

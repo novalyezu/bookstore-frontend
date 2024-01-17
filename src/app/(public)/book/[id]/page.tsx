@@ -6,8 +6,22 @@ import { useBook } from "@/hooks/book"
 import { useCart } from "@/hooks/cart"
 import { useGlobalState } from "@/hooks/state"
 import Image from "next/image"
+import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+
+const StockComp = (props: any) => {
+  if (props.quantity <= 0) {
+    return (
+      <span className="text-red-500">Out of stock!</span>
+    )
+  }
+  return (
+    <>
+      <span className="text-purple-500">{props.quantity}</span> pcs
+    </>
+  )
+}
 
 export default function BookDetail() {
   const [user] = useGlobalState('user')
@@ -77,7 +91,7 @@ export default function BookDetail() {
             <div className="text-gray-500">Publisher: <span className="text-purple-500">{book.publisher}</span></div>
             <div className="text-gray-500">Publish Date: <span className="text-purple-500">{book.publish_date}</span></div>
             <div className="text-gray-500">Pages: <span className="text-purple-500">{book.pages}</span></div>
-            <div className="text-gray-500">Stock: <span className="text-purple-500">{book.quantity}</span> pcs</div>
+            <div className="text-gray-500">Stock: <StockComp quantity={book.quantity} /></div>
             <div className="mt-3 text-2xl font-semibold">{formatUSD(book.price)}</div>
             <hr className="my-3" />
             <div>
@@ -86,13 +100,20 @@ export default function BookDetail() {
                 onChange={onChangeQuantityInput} value={quantity} min={0} max={book.quantity} />
               <button className="bg-transparent px-3 border-b-2 text-gray-900 font-semibold text-3xl" onClick={handleClickIncreaseQty}>+</button>
             </div>
-            <button className="bg-gray-900 py-2 mt-6 w-48 text-white font-semibold rounded-md" onClick={handleClickAddToCart}>Add to Cart</button>
+            <button className="bg-gray-900 py-2 mt-6 w-48 text-white font-semibold rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed"
+              disabled={book.quantity <= 0} onClick={handleClickAddToCart}>Add to Cart</button>
           </div>
         </>
       }
       {!isLoading && !book &&
-        <div className="mx-auto text-center text-2xl">
-          Book not found
+        <div className="mx-auto text-center">
+          <div className="text-5xl font-semibold">404</div>
+          <div className="text-2xl">
+            Book not found
+          </div>
+          <div className="mt-10">
+            <Link href={'/'} className="bg-gray-900 py-2 px-4 rounded-md text-white font-semibold">Back to Home</Link>
+          </div>
         </div>
       }
     </div>

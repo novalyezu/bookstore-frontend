@@ -56,19 +56,24 @@ export interface IOrderPayload {
   shipping_address: string;
 }
 
-const useOrder = () => {
+export interface IOrderQueryParams extends IQueryParams {
+  search: string;
+}
+
+const useOrderAdmin = () => {
   const token = storage.getItem(KEYS.token)
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingPost, setIsLoadingPost] = useState(false)
   const [orders, setOrders] = useState<IOrderData[]>([])
   const [order, setOrder] = useState<IOrderData>()
   const [pagination, setPagination] = useState<IPagination>()
-  const router = useRouter()
 
-  const getOrders = async (queryParams: IQueryParams) => {
+  const getOrders = async (queryParams: IOrderQueryParams) => {
     setIsLoading(true);
     try {
-      const { page, limit, orderBy } = queryParams;
-      const res = await fetch(`${BASE_URL}/api/v1/me/orders?page=${page}&limit=${limit}&orderBy=${orderBy}`, {
+      const { page, limit, orderBy, search } = queryParams;
+      const res = await fetch(`${BASE_URL}/api/v1/orders?page=${page}&limit=${limit}&orderBy=${orderBy}&search=${search}`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -79,7 +84,7 @@ const useOrder = () => {
         const errRes: IBaseErrorResponse = await res.json();
       } else {
         const resData: IBaseSuccessResponse<IOrderData[]> = await res.json();
-        setOrders((prevState) => [...prevState, ...resData.data]);
+        setOrders(resData.data);
         setPagination(resData.meta);
       }
     } catch (error) {
@@ -92,7 +97,7 @@ const useOrder = () => {
   const getOrderById = async (orderId: string) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${BASE_URL}/api/v1/me/orders/${orderId}`, {
+      const res = await fetch(`${BASE_URL}/api/v1/orders/${orderId}`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -113,7 +118,7 @@ const useOrder = () => {
   }
 
   const createOrder = async (bodyPayload: IOrderPayload) => {
-    setIsLoading(true);
+    setIsLoadingPost(true);
     try {
       const res = await fetch(`${BASE_URL}/api/v1/orders`, {
         method: 'POST',
@@ -129,7 +134,81 @@ const useOrder = () => {
       } else {
         const resData: IBaseSuccessResponse<string> = await res.json();
         toastSuccess('Order created')
-        router.push('/order')
+        router.push('/admin')
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoadingPost(false)
+    }
+  }
+
+  const updateOrder = async (orderId: string, bodyPayload: IOrderPayload) => {
+    setIsLoadingPost(true);
+    try {
+      const res = await fetch(`${BASE_URL}/api/v1/orders/${orderId}`, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(bodyPayload)
+      })
+      if (!res.ok) {
+        const errRes: IBaseErrorResponse = await res.json();
+        toastError(errRes.message);
+      } else {
+        const resData: IBaseSuccessResponse<string> = await res.json();
+        toastSuccess('Order updated')
+        router.push('/admin')
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoadingPost(false)
+    }
+  }
+
+  const deleteOrder = async (orderId: string) => {
+    setIsLoading(true)
+    try {
+      const res = await fetch(`${BASE_URL}/api/v1/orders/${orderId}`, {
+        method: 'DELETE',
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
+      })
+      if (!res.ok) {
+        const errRes: IBaseErrorResponse = await res.json();
+        toastError(errRes.message)
+      } else {
+        toastSuccess('Order deleted')
+        window.location.reload()
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const updateStatus = async (orderId: string, status: string) => {
+    setIsLoading(true)
+    try {
+      const res = await fetch(`${BASE_URL}/api/v1/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ order_status: status })
+      })
+      if (!res.ok) {
+        const errRes: IBaseErrorResponse = await res.json();
+        toastError(errRes.message)
+      } else {
+        toastSuccess('Status updated')
+        window.location.reload()
       }
     } catch (error) {
       console.log(error)
@@ -140,13 +219,17 @@ const useOrder = () => {
 
   return {
     isLoading,
+    isLoadingPost,
     orders,
     order,
     pagination,
     getOrders,
     getOrderById,
     createOrder,
+    updateOrder,
+    deleteOrder,
+    updateStatus,
   }
 }
 
-export { useOrder }
+export { useOrderAdmin }

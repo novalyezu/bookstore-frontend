@@ -1,6 +1,6 @@
 "use client"
 
-import { useAuth } from "@/hooks/auth"
+import { ROLE, useAuth } from "@/hooks/auth"
 import { useGlobalState } from "@/hooks/state"
 import Image from "next/image"
 import Link from "next/link"
@@ -30,6 +30,10 @@ export default function Navbar() {
       <div className="flex gap-3">
         {user &&
           <>
+            {user.role === ROLE.ADMIN &&
+              <Link href="/admin" className="p-3 text-lg font-semibold">Dashboard</Link>
+            }
+            <Link href="/" className="p-3 text-lg font-semibold">Home</Link>
             <Link href="/cart" className="p-3 text-lg font-semibold">Cart</Link>
             <Link href="/order" className="p-3 text-lg font-semibold">Order</Link>
             <div className="p-3">|</div>

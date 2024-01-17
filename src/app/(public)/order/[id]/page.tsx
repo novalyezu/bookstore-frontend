@@ -5,6 +5,7 @@ import { formatOrderDate, formatUSD } from "@/helper/utils";
 import { useOrder } from "@/hooks/order";
 import { useGlobalState } from "@/hooks/state";
 import Image from "next/image";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -103,9 +104,15 @@ export default function OrderDetail() {
         </>
       }
       {!isLoading && !order &&
-        <div className="mx-auto text-center text-2xl">
-          Order not found
-        </div>
+        <>
+          <div className="mx-auto text-center text-5xl font-semibold">404</div>
+          <div className="mx-auto text-center text-2xl">
+            Order not found
+          </div>
+          <div className="mx-auto text-center mt-10">
+            <Link href={'/'} className="bg-gray-900 py-2 px-4 rounded-md text-white font-semibold">Back to Home</Link>
+          </div>
+        </>
       }
     </div>
   )

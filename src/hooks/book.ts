@@ -41,7 +41,6 @@ const useBook = () => {
       })
       if (!res.ok) {
         const errRes: IBaseErrorResponse = await res.json();
-        console.log(errRes)
       } else {
         const resData: IBaseSuccessResponse<IBookData[]> = await res.json();
         setBooks((prevState) => [...prevState, ...resData.data]);
@@ -70,7 +69,6 @@ const useBook = () => {
       })
       if (!res.ok) {
         const errRes: IBaseErrorResponse = await res.json();
-        console.log(errRes)
       } else {
         const resData: IBaseSuccessResponse<IBookData> = await res.json();
         setBook(resData.data)

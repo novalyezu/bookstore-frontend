@@ -5,6 +5,11 @@ import { IBaseErrorResponse, IBaseSuccessResponse } from "@/helper/type";
 import { useState } from "react"
 import { setGlobalState, useGlobalState } from "./state";
 
+export const ROLE = {
+  ADMIN: "ADMIN",
+  USER: "USER"
+}
+
 export interface ILoginResponseData {
   id: string;
   email: string;
@@ -27,7 +32,6 @@ export interface IRegisterPayload {
 const useAuth = () => {
   const token = storage.getItem(KEYS.token)
   const [isLoading, setIsLoading] = useState(false)
-  const [isUserLoading, setIsUserLoading] = useGlobalState('isUserLoading')
 
   const login = async (bodyPayload: ILoginPayload) => {
     setIsLoading(true);
@@ -80,7 +84,7 @@ const useAuth = () => {
   }
 
   const getMe = async () => {
-    setIsUserLoading(true);
+    setGlobalState('isUserLoading', true);
     try {
       const res = await fetch(`${BASE_URL}/api/v1/me`, {
         method: 'GET',
@@ -99,7 +103,7 @@ const useAuth = () => {
     } catch (error) {
       console.log(error)
     } finally {
-      setIsUserLoading(false)
+      setGlobalState('isUserLoading', false)
     }
   }
 

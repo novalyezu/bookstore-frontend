@@ -8,6 +8,21 @@ const nextConfig = {
         destination: '/',
         permanent: true,
       },
+      {
+        source: '/admin/book/update',
+        destination: '/admin/book',
+        permanent: true,
+      },
+      {
+        source: '/admin/order',
+        destination: '/admin',
+        permanent: true,
+      },
+      {
+        source: '/admin/order/update',
+        destination: '/admin',
+        permanent: true,
+      },
     ]
   },
   images: {

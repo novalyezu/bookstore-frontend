@@ -10,6 +10,7 @@ export interface ICartData {
     id: string;
     title: string;
     price: number;
+    quantity: number;
     cover_image: string;
   }
   quantity: number;
@@ -37,7 +38,6 @@ const useCart = () => {
       })
       if (!res.ok) {
         const errRes: IBaseErrorResponse = await res.json();
-        console.log(errRes)
       } else {
         const resData: IBaseSuccessResponse<ICartData[]> = await res.json();
         setCarts(resData.data);
