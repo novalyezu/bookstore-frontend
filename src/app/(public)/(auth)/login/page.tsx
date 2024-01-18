@@ -66,7 +66,7 @@ export default function Login() {
         {isLoading ? 'Loading...' : 'Login'}
       </button>
       <div className="text-center text-gray-500">
-        Don't have an account? <Link className="text-gray-900 font-semibold underline" href="/register">Register</Link>
+        Don&apos;t have an account? <Link className="text-gray-900 font-semibold underline" href="/register">Register</Link>
       </div>
     </div>
   )

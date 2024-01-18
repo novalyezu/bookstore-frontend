@@ -1,0 +1,20 @@
+version: "3.8"
+
+services: 
+  bookstore_web:
+    container_name: bookstore_web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - appvolume:/app
+    ports:
+      - "8080:8080"
+    networks:
+      - bookstorenetwork
+
+networks:
+  bookstorenetwork:
+
+volumes:
+  appvolume:
