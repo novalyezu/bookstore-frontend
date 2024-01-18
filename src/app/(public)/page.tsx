@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const { isLoading, books, resetBooks, pagination, getBooks } = useBook();
   const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(8)
   const [orderBy, setOrderBy] = useState("createdAt__desc")
   const [search, setSearch] = useState("")
   let ignore = false;
