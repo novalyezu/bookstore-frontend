@@ -42,6 +42,7 @@ export default function Navbar() {
         }
         {!user &&
           <>
+            <Link href="/" className="p-3 text-lg font-semibold">Home</Link>
             <Link href="/login" className="p-3 text-lg font-semibold">Login</Link>
             <Link href="/register" className="p-3 text-lg font-semibold text-white bg-gray-900 rounded-xl">Register</Link>
           </>

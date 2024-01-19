@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   const { isLoading, books, resetBooks, pagination, getBooks } = useBook();
-  const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(8)
   const [orderBy, setOrderBy] = useState("createdAt__desc")
   const [search, setSearch] = useState("")
@@ -26,17 +25,17 @@ export default function Home() {
   }
 
   const handleClickLoadMore = () => {
-    setPage(pagination?.nextPage!);
+    getBooks({ page: pagination?.nextPage!, limit, orderBy, search });
   }
 
   useEffect(() => {
     if (!ignore) {
-      getBooks({ page, limit, orderBy, search });
+      getBooks({ page: 1, limit, orderBy, search });
     }
     return () => {
       ignore = true
     }
-  }, [page])
+  }, [])
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-225px)]">
